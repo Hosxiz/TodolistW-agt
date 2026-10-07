@@ -155,6 +155,33 @@
       color: white;
     }
 
+    .chip[data-priority="low"] {
+      border-color: rgba(143, 163, 138, 0.42);
+    }
+    .chip[data-priority="low"].active {
+      background: var(--forest);
+      border-color: var(--forest);
+      color: #fff;
+    }
+
+    .chip[data-priority="medium"] {
+      border-color: rgba(212, 175, 103, 0.55);
+    }
+    .chip[data-priority="medium"].active {
+      background: #a87522;
+      border-color: #a87522;
+      color: #fff;
+    }
+
+    .chip[data-priority="high"] {
+      border-color: rgba(191, 98, 77, 0.52);
+    }
+    .chip[data-priority="high"].active {
+      background: var(--clay-deep);
+      border-color: var(--clay-deep);
+      color: #fff;
+    }
+
     .toggle-theme {
       background: rgba(17,24,39,0.08);
     }
