@@ -441,6 +441,14 @@
               <div class="meta-label">เสร็จแล้ว</div>
               <div class="meta-value" id="doneTasks">0</div>
             </div>
+            <div class="meta-card">
+              <div class="meta-label">ความสำคัญสูง</div>
+              <div class="meta-value" id="highPriorityTasks">0</div>
+            </div>
+            <div class="meta-card">
+              <div class="meta-label">เกินกำหนด</div>
+              <div class="meta-value" id="overdueTasks">0</div>
+            </div>
           </div>
         </aside>
 
@@ -483,6 +491,8 @@
     const totalTasks = document.getElementById('totalTasks');
     const openTasks = document.getElementById('openTasks');
     const doneTasks = document.getElementById('doneTasks');
+    const highPriorityTasks = document.getElementById('highPriorityTasks');
+    const overdueTasks = document.getElementById('overdueTasks');
     const themeToggle = document.getElementById('themeToggle');
     const searchInput = document.getElementById('searchInput');
 
@@ -540,6 +550,16 @@
       return item;
     }
 
+    async function loadStats() {
+      const response = await fetch('/stats');
+      const stats = await response.json();
+      totalTasks.textContent = String(stats.total);
+      openTasks.textContent = String(stats.open);
+      doneTasks.textContent = String(stats.completed);
+      highPriorityTasks.textContent = String(stats.high_priority);
+      overdueTasks.textContent = String(stats.overdue);
+    }
+
     async function loadTasks() {
       const params = new URLSearchParams();
       if (state.status !== 'all') params.set('status', state.status);
@@ -556,11 +576,7 @@
         tasks.forEach(task => taskList.appendChild(renderTask(task)));
       }
 
-      const open = tasks.filter(task => !task.completed).length;
-      const done = tasks.filter(task => task.completed).length;
-      totalTasks.textContent = String(tasks.length);
-      openTasks.textContent = String(open);
-      doneTasks.textContent = String(done);
+      await loadStats();
     }
 
     taskForm.addEventListener('submit', async (event) => {

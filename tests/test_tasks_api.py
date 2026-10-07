@@ -66,6 +66,23 @@ def test_search_matches_title_and_description(client):
     assert unrelated["id"] not in result_ids
 
 
+def test_stats_are_based_on_all_tasks(client):
+    client.post("/tasks", json={"title": "Open high priority", "priority": "high", "due_date": "2000-01-01"})
+    client.post("/tasks", json={"title": "Open task", "priority": "low"})
+    client.post("/tasks", json={"title": "Completed task", "completed": True, "priority": "medium"})
+
+    response = client.get("/stats")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "total": 3,
+        "open": 2,
+        "completed": 1,
+        "high_priority": 1,
+        "overdue": 1,
+    }
+
+
 def test_update_task(client):
     created = client.post(
         "/tasks",

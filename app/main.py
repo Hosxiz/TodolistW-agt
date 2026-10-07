@@ -7,8 +7,8 @@ from fastapi import FastAPI, HTTPException, Query, status
 from fastapi.responses import FileResponse
 
 from .database import initialize_db
-from .schema import TaskCreate, TaskRead, TaskUpdate
-from .service import create_task, delete_task, get_task_by_id, list_tasks, update_task
+from .schema import TaskCreate, TaskRead, TaskStats, TaskUpdate
+from .service import create_task, delete_task, get_stats, get_task_by_id, list_tasks, update_task
 
 
 @asynccontextmanager
@@ -28,6 +28,11 @@ def index_page() -> FileResponse:
 @app.get("/health")
 def health_check() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/stats", response_model=TaskStats)
+def stats_endpoint() -> TaskStats:
+    return get_stats()
 
 
 @app.post("/tasks", response_model=TaskRead, status_code=status.HTTP_201_CREATED)

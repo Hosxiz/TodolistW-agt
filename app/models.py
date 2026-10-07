@@ -13,3 +13,12 @@ class TaskRecord:
     due_date: str | None
     created_at: str
     updated_at: str
+
+
+@dataclass
+class TaskStats:
+    total: int
+    open: int
+    completed: int
+    high_priority: int
+    overdue: int

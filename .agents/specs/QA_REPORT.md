@@ -5,11 +5,12 @@
 - **Auditor:** QA & Code Reviewer
 - **Timestamp:** 2026-10-07
 - **Change Verified:** Search tasks by title or description, combined with existing status and priority filters.
+- **Additional Change Verified:** Statistics dashboard totals based on all tasks, including open, completed, high-priority, and overdue values.
 
 ## 2. Test Execution Results
 | Test Suite / Command | Total | Passed | Failed | Duration |
 | :--- | :--- | :--- | :--- | :--- |
-| `d:\E\TESTA\.venv\Scripts\python.exe -m pytest -q` | 5 | 5 | 0 | 1.33s |
+| `d:\E\TESTA\.venv\Scripts\python.exe -m pytest -q` | 6 | 6 | 0 | 2.95s |
 
 ## 3. Code Quality & Security Checklist
 - [x] No unhandled exceptions or unchecked null/undefined values
@@ -18,8 +19,10 @@
 - [x] Search checks title and description using parameterized SQL
 - [x] Search regression test uses unique data to remain reliable with persistent SQLite storage
 - [x] Existing UI empty state is retained when a search has no matches
+- [x] Stats endpoint uses parameterized SQL aggregation and returns zero values for empty databases
 - [ ] No XSS review was performed for this change; existing task rendering uses `innerHTML` with task data
 
 ## 4. Warning
 - The test run emitted a Starlette deprecation warning: `httpx` with `starlette.testclient` is deprecated; Starlette recommends `httpx2`.
 - Task data is interpolated into `innerHTML` in the existing dashboard renderer. This pre-existing rendering path should be escaped or converted to safe DOM text assignment in a separate security-focused change.
+- The stats dashboard uses all-task aggregates and does not depend on the active status, priority, or search filter.

@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from .database import get_connection
-from .models import TaskRecord
+from .models import TaskRecord, TaskStats
 from .schema import TaskCreate, TaskUpdate
 
 
@@ -55,6 +55,32 @@ def list_tasks(
     with get_connection() as conn:
         rows = conn.execute(query, params).fetchall()
         return [_row_to_record(row) for row in rows]
+
+
+def get_stats() -> TaskStats:
+    query = """
+        SELECT
+            COUNT(*) AS total,
+            SUM(CASE WHEN completed = 0 THEN 1 ELSE 0 END) AS open,
+            SUM(CASE WHEN completed = 1 THEN 1 ELSE 0 END) AS completed,
+            SUM(CASE WHEN priority = 'high' THEN 1 ELSE 0 END) AS high_priority,
+            SUM(
+                CASE
+                    WHEN completed = 0 AND due_date IS NOT NULL AND due_date < CURRENT_DATE THEN 1
+                    ELSE 0
+                END
+            ) AS overdue
+        FROM tasks
+    """
+    with get_connection() as conn:
+        row = conn.execute(query).fetchone()
+        return TaskStats(
+            total=int(row["total"]),
+            open=int(row["open"] or 0),
+            completed=int(row["completed"] or 0),
+            high_priority=int(row["high_priority"] or 0),
+            overdue=int(row["overdue"] or 0),
+        )
 
 
 def get_task_by_id(task_id: int) -> TaskRecord | None:

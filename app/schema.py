@@ -35,3 +35,11 @@ class TaskRead(BaseModel):
     due_date: str | None = None
     created_at: str
     updated_at: str
+
+
+class TaskStats(BaseModel):
+    total: int
+    open: int
+    completed: int
+    high_priority: int
+    overdue: int

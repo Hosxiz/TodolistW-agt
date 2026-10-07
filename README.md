@@ -7,6 +7,7 @@ A lightweight FastAPI task-management MVP with a browser UI and SQLite persisten
 - Set priority and due date
 - Filter by status and priority
 - Search tasks by title or description
+- View total, open, completed, high-priority, and overdue task statistics
 - Toggle dark mode
 - Use the API from another application
 
@@ -34,6 +35,8 @@ curl.exe -X POST http://127.0.0.1:8000/tasks `
 curl.exe http://127.0.0.1:8000/tasks
 
 curl.exe "http://127.0.0.1:8000/tasks?q=README"
+
+curl.exe http://127.0.0.1:8000/stats
 ```
 
 ## Test
