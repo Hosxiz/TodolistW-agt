@@ -517,22 +517,22 @@
       return isNaN(date) ? 'ไม่มีวันกำหนด' : date.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
     }
 
+    function createTextElement(tagName, className, text) {
+      const element = document.createElement(tagName);
+      element.className = className;
+      element.textContent = text;
+      return element;
+    }
+
     function renderTask(task) {
       const item = document.createElement('li');
       item.className = `task-item ${task.completed ? 'completed' : ''}`;
-      item.innerHTML = `
-        <input class="task-check" type="checkbox" ${task.completed ? 'checked' : ''} aria-label="เปลี่ยนสถานะงาน ${task.title}" />
-        <div class="task-content">
-          <div class="task-title">${task.title}</div>
-          <div class="task-description">${task.description || 'ไม่มีรายละเอียด'}</div>
-        </div>
-        <span class="priority-badge priority-${task.priority || 'medium'}">${getPriorityLabel(task.priority || 'medium')}</span>
-        <span class="status-badge ${task.completed ? 'status-done' : 'status-open'}">${getStatusLabel(task.completed)}</span>
-        <span class="date-badge">${formatDueDate(task.due_date)}</span>
-        <button class="danger-btn" type="button" aria-label="ลบงาน ${task.title}">ลบ</button>
-      `;
 
-      const checkbox = item.querySelector('.task-check');
+      const checkbox = document.createElement('input');
+      checkbox.className = 'task-check';
+      checkbox.type = 'checkbox';
+      checkbox.checked = task.completed;
+      checkbox.setAttribute('aria-label', `เปลี่ยนสถานะงาน ${task.title}`);
       checkbox.addEventListener('change', async () => {
         await fetch(`/tasks/${task.id}`, {
           method: 'PATCH',
@@ -542,11 +542,36 @@
         loadTasks();
       });
 
-      item.querySelector('.danger-btn').addEventListener('click', async () => {
+      const content = document.createElement('div');
+      content.className = 'task-content';
+      content.append(
+        createTextElement('div', 'task-title', task.title),
+        createTextElement('div', 'task-description', task.description || 'ไม่มีรายละเอียด')
+      );
+
+      const priority = createTextElement(
+        'span',
+        `priority-badge priority-${task.priority || 'medium'}`,
+        getPriorityLabel(task.priority || 'medium')
+      );
+      const status = createTextElement(
+        'span',
+        `status-badge ${task.completed ? 'status-done' : 'status-open'}`,
+        getStatusLabel(task.completed)
+      );
+      const dueDate = createTextElement('span', 'date-badge', formatDueDate(task.due_date));
+
+      const deleteButton = document.createElement('button');
+      deleteButton.className = 'danger-btn';
+      deleteButton.type = 'button';
+      deleteButton.setAttribute('aria-label', `ลบงาน ${task.title}`);
+      deleteButton.textContent = 'ลบ';
+      deleteButton.addEventListener('click', async () => {
         await fetch(`/tasks/${task.id}`, { method: 'DELETE' });
         loadTasks();
       });
 
+      item.append(checkbox, content, priority, status, dueDate, deleteButton);
       return item;
     }
 

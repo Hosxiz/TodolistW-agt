@@ -49,6 +49,22 @@ def test_create_and_list_task(client):
     assert any(item["priority"] == "high" for item in filtered.json())
 
 
+def test_task_text_is_not_treated_as_html(client):
+    payload = "<img src=x onerror=alert('xss')>"
+    created = client.post(
+        "/tasks",
+        json={"title": payload, "description": payload},
+    )
+
+    assert created.status_code == 201
+    assert created.json()["title"] == payload
+    assert created.json()["description"] == payload
+
+    listed = client.get("/tasks")
+    assert listed.status_code == 200
+    assert any(task["title"] == payload for task in listed.json())
+
+
 def test_search_matches_title_and_description(client):
     marker = f"search-{uuid4().hex}"
     title_match = client.post("/tasks", json={"title": f"{marker} title match"}).json()

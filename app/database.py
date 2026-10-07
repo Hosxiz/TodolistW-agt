@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import os
 import sqlite3
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Iterator
 
-DB_PATH = Path(__file__).resolve().parent.parent / "tasks.db"
+DEFAULT_DATA_DIR = Path(__file__).resolve().parent.parent
+DB_PATH = Path(os.getenv("TASK_DATA_DIR", DEFAULT_DATA_DIR)) / "tasks.db"
 
 
 @contextmanager
@@ -20,6 +22,7 @@ def get_connection() -> Iterator[sqlite3.Connection]:
 
 
 def initialize_db() -> None:
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     with get_connection() as conn:
         conn.execute(
             """
